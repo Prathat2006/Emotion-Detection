@@ -37,6 +37,3 @@ Install the required Python packages using the command:
 pip install -r requirements.txt
 
 
-### Created by Prathmesh Hatwar
-          #    Vikas Babu 
-          #    Kanchan Kumari
