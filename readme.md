@@ -35,5 +35,36 @@ This repository contains an advanced emotion detection system that leverages sta
 Install the required Python packages using the command:
 ```bash
 pip install -r requirements.txt
+```
+
+---
+
+## Usage
+
+Run the application:
+```bash
+python main.py
+```
+
+1. Open the Gradio interface.
+2. Upload an image with a clear face.
+3. View the detected emotion, GIF, and listen to the mood-specific audio.
+
+---
+
+## Debugging
+
+Enable debug mode by uncommenting the `save_debug_info` lines in the code.
+Debug information (input image and results) will be saved in the `debug/` directory.
+
+---
+
+## Credits
+
+This project was developed by:
+
+- Prathmesh Hatwar
+- Kanchan Kumari
+- Vikas Babu
 
 
