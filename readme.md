@@ -65,6 +65,6 @@ This project was developed by:
 
 - Prathmesh Hatwar
 - Kanchan Kumari
-- Vikas Babu
+- Vikas Babu (https://github.com/Vikas76-bit)
 
 
