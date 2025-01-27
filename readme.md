@@ -64,7 +64,7 @@ Debug information (input image and results) will be saved in the `debug/` direct
 This project was developed by:
 
 - Prathmesh Hatwar
-- Kanchan Kumari
+- Kanchan Kumari (https://github.com/KumariKanchan734)
 - Vikas Babu (https://github.com/Vikas76-bit)
 
 
