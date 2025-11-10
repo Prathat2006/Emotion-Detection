@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Emotion Detector 🎭</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #121212 0%, #1e1e2e 100%);
+      margin: 0;
+      padding: 20px;
+      min-height: 100vh;
+      color: #e0e0e0;
+    }
+    h1 {
+      text-align: center;
+      margin-bottom: 50px;
+      margin-Top: 70px;
+      color: #6ab3f3;
+      font-weight: 600;
+      font-size: 5em;
+    }
+    .container {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      align-items: flex-start;
+      gap: 25px;
+      max-width: 1000px;
+      margin: 0 auto;
+      background: #1e1e2e;
+      border-radius: 16px;
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.5);
+      padding: 25px;
+      border: 1px solid #333;
+    }
+    .panel {
+      flex: 1;
+      min-width: 280px;
+      max-width: 450px;
+    }
+    .upload-area {
+      border: 2px dashed #444;
+      border-radius: 12px;
+      padding: 25px;
+      margin-bottom: 15px;
+      cursor: pointer;
+      transition: border-color 0.3s, background-color 0.3s;
+      background: #252536;
+      text-align: center;
+    }
+    .upload-area:hover {
+      border-color: #6ab3f3;
+      background: #2a2a3c;
+    }
+    .upload-area p {
+      margin: 0;
+      color: #aaa;
+    }
+    #fileInput {
+      display: none;
+    }
+    #imagePreview {
+      max-width: 100%;
+      max-height: 300px;
+      margin: 15px auto;
+      display: none;
+      border-radius: 10px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+      border: 1px solid #333;
+    }
+    button {
+      background: #4a6fa5;
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      font-size: 16px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background 0.3s;
+      font-weight: 600;
+      width: 100%;
+    }
+    button:hover:not(:disabled) {
+      background: #5a80b8;
+    }
+    button:disabled {
+      background: #444;
+      color: #777;
+      cursor: not-allowed;
+    }
+    .result {
+      background: #252536;
+      border-radius: 10px;
+      padding: 20px;
+      border: 1px solid #333;
+      text-align: center;
+    }
+    
+    #resultPanel {
+      display: none;
+    }
+
+    .gif-container {
+      margin: 15px 0;
+    }
+    .result img {
+      max-width: 180px;
+      height: auto;
+      border-radius: 8px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+    }
+    
+    /* MODIFIED: Container styles */
+    .audio-container {
+      display: none; /* Hide by default */
+      background: #1e1e2e;
+      border-radius: 10px;
+      padding: 15px;
+      margin-top: 15px;
+      border: 1px solid #444;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3) inset;
+    }
+    
+    /* MODIFIED: Hide the default audio player */
+    audio {
+      display: none;
+    }
+
+    /* MODIFIED: Styles for our brand new custom player */
+    .custom-player {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    #playPauseBtn {
+      background: #6ab3f3;
+      border: none;
+      border-radius: 50%; /* Make it circular */
+      width: 40px; /* Fixed size */
+      height: 40px;
+      padding: 0; /* Remove default padding */
+      flex-shrink: 0; /* Don't let it shrink */
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    #playPauseBtn:hover {
+      background: #7ac3f5;
+    }
+    #playPauseBtn svg {
+      width: 20px;
+      height: 20px;
+      fill: #1e1e2e; /* Dark icon color */
+    }
+
+    .progress-bar {
+      flex: 1; /* Take up remaining space */
+      background: #333;
+      height: 8px;
+      border-radius: 4px;
+      cursor: pointer;
+      overflow: hidden; /* Ensure progress stays inside */
+    }
+
+    .progress {
+      background: #6ab3f3;
+      height: 100%;
+      width: 0%; /* Will be updated by JS */
+      border-radius: 4px;
+      transition: width 0.1s linear; /* Smooth progress update */
+    }
+    
+    .time-display {
+      font-size: 0.9em;
+      color: #aaa;
+      min-width: 35px; /* Stop layout shift */
+      text-align: right;
+    }
+    /* END OF NEW STYLES */
+
+    .error {
+      color: #f87171;
+      margin-top: 15px;
+      font-size: 0.95em;
+      text-align: center;
+    }
+    .loader {
+      display: none;
+      margin: 20px auto;
+      border: 4px solid #333;
+      border-top: 4px solid #6ab3f3;
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      animation: spin 1s linear infinite;
+    }
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+  </style>
+</head>
+<body>
+  
+  <h1>🎭 Emotion Detector</h1>
+
+  <div class="container">
+    <div class="panel">
+      <div class="upload-area" id="dropArea">
+        <p>📷 Click to upload or drag & drop</p>
+        <input type="file" id="fileInput" accept="image/*" />
+      </div>
+      <img id="imagePreview" alt="Preview" />
+      <button id="analyzeBtn" disabled>Analyze Emotion</button>
+      <div class="loader" id="loader"></div>
+      <div class="error" id="errorMsg" style="display:none;"></div>
+    </div>
+
+    <div class="panel" id="resultPanel">
+      <div class="result" id="result">
+        <h3>Analysis Result</h3>
+        <p><strong>Most Confident:</strong> <span id="mostConfident"></span> (<span id="confidence"></span>%)</p>
+        <p><strong>Most Common:</strong> <span id="mostCommon"></span> (Avg: <span id="avgConfidence"></span>%)</p>
+
+        <div class="gif-container">
+          <img id="emotionGif" src="" alt="Emotion GIF" style="display:none;">
+        </div>
+
+        <div class="audio-container" id="audioContainer">
+          <audio id="emotionSong"></audio> 
+          
+          <div class="custom-player">
+            <button id="playPauseBtn">
+              <svg id="playIcon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+              <svg id="pauseIcon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" style="display:none;"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
+            </button>
+            <span id="currentTime" class="time-display">0:00</span>
+            <div id="progressBar" class="progress-bar">
+              <div id="progress" class="progress"></div>
+            </div>
+            <span id="totalDuration" class="time-display">0:00</span>
+          </div>
+        </div>
+        </div>
+    </div>
+  </div>
+
+  <script>
+    const fileInput = document.getElementById('fileInput');
+    const dropArea = document.getElementById('dropArea');
+    const imagePreview = document.getElementById('imagePreview');
+    const analyzeBtn = document.getElementById('analyzeBtn');
+    const loader = document.getElementById('loader');
+    const resultPanel = document.getElementById('resultPanel'); 
+    const errorMsg = document.getElementById('errorMsg');
+    const emotionGif = document.getElementById('emotionGif');
+    const audioContainer = document.getElementById('audioContainer');
+
+    // MODIFIED: Get all elements for the custom player
+    const emotionSong = document.getElementById('emotionSong');
+    const playPauseBtn = document.getElementById('playPauseBtn');
+    const playIcon = document.getElementById('playIcon');
+    const pauseIcon = document.getElementById('pauseIcon');
+    const progressBar = document.getElementById('progressBar');
+    const progress = document.getElementById('progress');
+    const currentTimeEl = document.getElementById('currentTime');
+    const totalDurationEl = document.getElementById('totalDuration');
+
+    let selectedFile = null;
+
+    // --- Helper function to format time (0:00) ---
+    function formatTime(seconds) {
+      const minutes = Math.floor(seconds / 60);
+      const secs = Math.floor(seconds % 60);
+      return `${minutes}:${secs < 10 ? '0' : ''}${secs}`;
+    }
+
+    // --- MODIFIED: Event listeners for custom player ---
+    
+    // Play/Pause button
+    playPauseBtn.addEventListener('click', () => {
+      if (emotionSong.paused) {
+        emotionSong.play();
+      } else {
+        emotionSong.pause();
+      }
+    });
+
+    // When audio plays, change icon to Pause
+    emotionSong.addEventListener('play', () => {
+      playIcon.style.display = 'none';
+      pauseIcon.style.display = 'block';
+    });
+
+    // When audio pauses, change icon to Play
+    emotionSong.addEventListener('pause', () => {
+      playIcon.style.display = 'block';
+      pauseIcon.style.display = 'none';
+    });
+
+    // When song ends, reset icon
+    emotionSong.addEventListener('ended', () => {
+      playIcon.style.display = 'block';
+      pauseIcon.style.display = 'none';
+      progress.style.width = '0%';
+      currentTimeEl.textContent = formatTime(0);
+    });
+
+    // When song metadata (like duration) is loaded
+    emotionSong.addEventListener('loadedmetadata', () => {
+      totalDurationEl.textContent = formatTime(emotionSong.duration);
+    });
+
+    // As song plays, update progress bar and current time
+    emotionSong.addEventListener('timeupdate', () => {
+      const percent = (emotionSong.currentTime / emotionSong.duration) * 100;
+      progress.style.width = `${percent}%`;
+      currentTimeEl.textContent = formatTime(emotionSong.currentTime);
+    });
+
+    // Allow seeking by clicking on the progress bar
+    progressBar.addEventListener('click', (e) => {
+      const rect = progressBar.getBoundingClientRect();
+      const clickX = e.clientX - rect.left;
+      const width = rect.width;
+      const duration = emotionSong.duration;
+      
+      emotionSong.currentTime = (clickX / width) * duration;
+    });
+
+    // --- End of custom player JS ---
+
+    function updatePreview(file) {
+      if (file && file.type.startsWith('image/')) {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          imagePreview.src = e.target.result;
+          imagePreview.style.display = 'block';
+        };
+        reader.readAsDataURL(file);
+      } else {
+        imagePreview.style.display = 'none';
+      }
+    }
+
+    dropArea.addEventListener('click', () => fileInput.click());
+
+    fileInput.addEventListener('change', (e) => {
+      selectedFile = e.target.files[0];
+      if (selectedFile) {
+        updatePreview(selectedFile);
+        analyzeBtn.disabled = false;
+        dropArea.innerHTML = `<p>Selected: ${selectedFile.name}</p>`;
+        resultPanel.style.display = 'none';
+      } else {
+        imagePreview.style.display = 'none';
+        analyzeBtn.disabled = true;
+        dropArea.innerHTML = '<p>📷 Click to upload or drag & drop</p>';
+      }
+    });
+
+    // Drag and drop
+    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+      dropArea.addEventListener(eventName, preventDefaults, false);
+    });
+    function preventDefaults(e) { e.preventDefault(); e.stopPropagation(); }
+    ['dragenter', 'dragover'].forEach(eventName => dropArea.addEventListener(eventName, highlight, false));
+    ['dragleave', 'drop'].forEach(eventName => dropArea.addEventListener(eventName, unhighlight, false));
+    function highlight() { dropArea.style.borderColor = '#6ab3f3'; dropArea.style.backgroundColor = '#2a2a3c'; }
+    function unhighlight() { dropArea.style.borderColor = '#444'; dropArea.style.backgroundColor = '#252536'; }
+
+    dropArea.addEventListener('drop', (e) => {
+      selectedFile = e.dataTransfer.files[0];
+      if (selectedFile && selectedFile.type.startsWith('image/')) {
+        updatePreview(selectedFile);
+        analyzeBtn.disabled = false;
+        dropArea.innerHTML = `<p>Selected: ${selectedFile.name}</p>`;
+        resultPanel.style.display = 'none';
+      } else {
+        showError('Please upload a valid image file.');
+        imagePreview.style.display = 'none';
+        analyzeBtn.disabled = true;
+      }
+    });
+
+    analyzeBtn.addEventListener('click', async () => {
+      if (!selectedFile) return;
+
+      errorMsg.style.display = 'none';
+      resultPanel.style.display = 'none'; 
+      emotionGif.style.display = 'none';
+      audioContainer.style.display = 'none';
+      loader.style.display = 'block';
+      
+      // MODIFIED: Reset player UI
+      emotionSong.pause();
+      emotionSong.currentTime = 0;
+      progress.style.width = '0%';
+      currentTimeEl.textContent = '0:00';
+      totalDurationEl.textContent = '0:00';
+
+      const formData = new FormData();
+      formData.append('file', selectedFile);
+
+      try {
+        const response = await fetch('/detect_emotion', {
+          method: 'POST',
+          body: formData,
+        });
+
+        loader.style.display = 'none';
+
+        if (!response.ok) {
+          const err = await response.json().catch(() => ({}));
+          throw new Error(err.error || 'Unknown server error');
+        }
+
+        const data = await response.json();
+
+        document.getElementById('mostConfident').textContent = data.most_confident_emotion.emotion;
+        document.getElementById('confidence').textContent = data.most_confident_emotion.confidence;
+        document.getElementById('mostCommon').textContent = data.most_common_emotion.emotion;
+        document.getElementById('avgConfidence').textContent = data.most_common_emotion.average_confidence;
+
+        // Show GIF
+        if (data.gif_path) {
+          emotionGif.src = `gif/${data.most_confident_emotion.emotion}`;
+          emotionGif.style.display = 'inline-block';
+        }
+
+        // Handle song with autoplay
+        if (data.song_path) {
+          const songUrl = `/song/${data.most_confident_emotion.emotion}`;
+          emotionSong.src = songUrl;
+          audioContainer.style.display = 'block';
+          emotionSong.load();
+
+          const playPromise = emotionSong.play();
+          if (playPromise !== undefined) {
+            playPromise.catch(() => { /* Autoplay failed */ });
+          }
+        }
+
+        resultPanel.style.display = 'block'; 
+        
+      } catch (error) {
+        loader.style.display = 'none';
+        showError('Error: ' + error.message);
+      }
+    });
+
+    function showError(message) {
+      errorMsg.textContent = message;
+      errorMsg.style.display = 'block';
+    }
+  </script>
+</body>
+</html>
