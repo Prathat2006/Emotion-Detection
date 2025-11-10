@@ -66,7 +66,7 @@ It detects human emotions from images using **Vision Transformers (ViT)** and pr
 ### 1. Clone the repository
 
 ```bash
-git clone https://github.com/<yourusername>/emotion-detection-api.git
+git clone https://github.com/Prathat2006/Emotion-Detection.git
 cd emotion-detection-api
 ```
 
