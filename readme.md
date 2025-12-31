@@ -73,6 +73,11 @@ cd emotion-detection-api
 ### 2. Install dependencies
 
 ```bash
+uv sync 
+
+# or 
+python -m venv .venv
+.\.venv\Scripts\activate
 pip install -r requirements.txt
 ```
 
