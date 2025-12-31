@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "emotion-detection": {
+      "command": "python",
+      "args": ["D:\\project\\miscellaneous\\Emotion Detection - Copy\\Emotion-Detection\\emotionmcp.py"]
+    }
+  }
+}
