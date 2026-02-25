@@ -1,4 +1,4 @@
-# 🎭 Emotion Detection API
+# Emotion Detection 
 
 This repository contains a **high-accuracy emotion detection system** built on top of cutting-edge deep learning models and a modern API-based architecture.
 It detects human emotions from images using **Vision Transformers (ViT)** and provides **personalized multimedia feedback** through a custom frontend.
@@ -81,16 +81,6 @@ python -m venv .venv
 pip install -r requirements.txt
 ```
 
-### 3. Prepare assets
-
-Make sure these folders exist and contain your emotion resources:
-
-```
-./emoji/happy.gif
-./emoji/sad.gif
-./songs/happy.mp3
-./songs/sad.mp3
-```
 
 ---
 
@@ -116,46 +106,5 @@ uvicorn app:app --host 0.0.0.0 --port 8000 --reload
 curl -X POST "http://localhost:8000/detect_emotion" \
      -F "file=@face.jpg"
 ```
-
-**Response Example:**
-
-```json
-{
-  "most_confident_emotion": {
-    "emotion": "happy",
-    "confidence": 96.4
-  },
-  "most_common_emotion": {
-    "emotion": "happy",
-    "average_confidence": 91.7
-  },
-  "gif_path": "./emoji/happy.gif",
-  "song_path": "./songs/happy.mp3"
-}
-```
-
----
-
-## 🧰 Debug Mode
-
-You can easily extend the code to log detections or save intermediate images by enabling debug utilities.
-Simply add or uncomment the `save_debug_info()` calls in `detect_emotion()`.
-
----
-
-## 🧑‍💻 Developers
-
-| Name                 | GitHub                                                             |
-| -------------------- | ------------------------------------------------------------------ |
-| **Prathmesh Hatwar** | —                                                                  |
-| **Kanchan Kumari**   | [github.com/KumariKanchan734](https://github.com/KumariKanchan734) |
-| **Vikas Babu**       | [github.com/Vikas76-bit](https://github.com/Vikas76-bit)           |
-
----
-
-## 🧾 License
-
-This project is distributed under the **MIT License**.
-You are free to use, modify, and distribute it with attribution.
 
 ---
